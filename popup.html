@@ -1,0 +1,89 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet'>
+    <style>
+      #logout {
+        font-family: "Roboto", sans-serif;
+        outline: 0;
+        background: #d32f2f;
+        width: 175px;
+        height: 50px;
+        border: 0;
+        padding: 2px;
+        color: #FFFFFF;
+        font-size: 14px;
+        -webkit-transition: all 0.3 ease;
+        transition: all 0.3 ease;
+        cursor: pointer;
+        margin-bottom: 8px;
+        border-radius: 4px;
+      }
+      #logout:hover {
+        background: #e53935;
+      }
+      #login {
+        font-family: "Roboto", sans-serif;
+        outline: 0;
+        background: #43A047;
+        width: 175px;
+        height: 50px;
+        border: 0;
+        padding: 2px;
+        color: #FFFFFF;
+        font-size: 14px;
+        -webkit-transition: all 0.3 ease;
+        transition: all 0.3 ease;
+        cursor: pointer;
+        margin-bottom: 8px;
+        border-radius: 4px;
+      }
+      #login:hover {
+        background: #4CAF50;
+      }
+      #changecred {
+        font-family: "Roboto", sans-serif;
+        outline: 0;
+        background: #5C6BC0;
+        width: 175px;
+        height: 50px;
+        border: 0;
+        padding: 2px;
+        color: #FFFFFF;
+        font-size: 14px;
+        -webkit-transition: all 0.3 ease;
+        transition: all 0.3 ease;
+        cursor: pointer;
+        border-radius: 4px;
+      }
+      #changecred:hover {
+        background: #7986CB;
+      }
+      body {
+        background: #FFFFFF;
+        /* fallback for old browsers */
+        /*background: -webkit-linear-gradient(right, #76b852, #8DC26F);
+        background: -moz-linear-gradient(right, #76b852, #8DC26F);
+        background: -o-linear-gradient(right, #76b852, #8DC26F);
+        background: linear-gradient(to left, #76b852, #8DC26F);
+        */
+        font-family: "Roboto", sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        
+      }
+    </style>
+    <title>
+      IITG AutoLogin
+    </title>
+  </head>
+  <body>
+    <p id="msg">No credentials saved. Go to extension options to enter credentials.</p>
+    <button id="login">Login/Refresh</button>
+    <button id="logout">Logout</button>
+    <button id="changecred">Change Credentials</button>
+    <script src="jquery.min.js"></script>
+    <script src="popup.js"></script>
+  </body>
+</html>
