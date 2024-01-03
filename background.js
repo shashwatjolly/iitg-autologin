@@ -98,7 +98,7 @@ function keepalive(result) {
 	 //        }
   //     	});
 	}
-	const url = $(result).text().split("location.href=")[1].split("\"")[1];
+	const url = $(result).text().split("window.location=")[1].split("\"")[1];
 	console.log(url);
 	if(url) {
 		$.ajax({
