@@ -1,76 +1,89 @@
-chrome.runtime.onInstalled.addListener(function (details) {
-  chrome.runtime.openOptionsPage();
+chrome.runtime.onInstalled.addListener(function() {
+    chrome.runtime.openOptionsPage();
 });
-
-console.log("AutoLogin Started");
-chrome.browserAction.setIcon({path: "iconDisconnected.png"});		
-
 var username;
 var password;
-
-function get_options() {
-  chrome.storage.sync.get([
-    "username",
-    "password"
-  ], function(items) {
-    if(items.username) {
-      username = items.username;
-      password = items.password;
-      start();
-    }
-    else {
-      console.log("AutoLogin credentials not saved");
-      return;
-    }
-  });
-}
-
-function start() {
-	$.ajax({		// logout first
-        url: "https://agnigarh.iitg.ac.in:1442/logout?030403030f050d06",
-        type: "GET",
-        success: function() {
-        	$.ajax({
-				url: "https://agnigarh.iitg.ac.in:1442/login?",
-				type: "GET",
-				success: login,
-				error: function(error) {
-					console.log(error);
-					start();
-				}
-			});
-        },
-        error: function(error) {
-          console.log(error);
-          start();
+chrome.action.setIcon({path: "iconDisconnected.png"});		
+function getcred(){
+    chrome.storage.sync.get([
+        "username",
+        "password"
+      ], function(result) {
+        if(result.username) {
+            username = result.username;
+            password = result.password;
+            start();
         }
-  	});
+        else {
+            console.log("AutoLogin credentials not saved");
+            return;
+        }
+    });
+}
+function start() {
+    fetch("https://agnigarh.iitg.ac.in:1442/logout?",{
+        method:'GET',
+    })
+    .then(res=>{
+        if(!res.ok){
+            alert("Logout Unsuccessful");
+            start();
+        }
+    })
+    .then(()=>{
+        fetch("https://agnigarh.iitg.ac.in:1442/login?")
+        .then(response=>{
+            if(!response.ok){
+                alert("Login Unsuccessful");
+                start();
+            }
+            return response.text();
+        })
+        .then(data => {
+            // console.log(data);
+            var magic = data.split('name="magic" value="')[1].substring(0,16);
+            var tredir = "https://agnigarh.iitg.ac.in:1442/login?"
+            login(magic,tredir);
+        })
+        .catch(error => {
+            console.error("Error fetching website data:",error);
+            start();
+        })
+    }).catch(error => {
+        console.log(error);
+        start();
+    })
 }
 
-function login(result) {
-	console.log(result);
-	const magic = $(result).find('[name="magic"]').attr("value");
-	const Tredir = $(result).find('[name="4Tredir"]').attr("value");
-	console.log(magic);
-	console.log(Tredir);
-	const payload = {'4Tredir': Tredir, 'magic': magic, 'username': username, 'password': password};
-	$.ajax({		// now login
-		url: "https://agnigarh.iitg.ac.in:1442",
-		data: payload,
-		type: "POST",
-		success: keepalive,
-		error: function(error) {
-			console.log(error);
-			start();
-		}
-	});
-	
+function login(magic,tredir){
+    const payload = {'4Tredir': tredir, 'magic': magic, 'username': username, 'password': password};
+    let formData = new URLSearchParams();
+    formData.append('4Tredir', tredir);
+    formData.append('magic', magic);
+    formData.append('username',username);
+    formData.append('password', password);
+    fetch("https://agnigarh.iitg.ac.in:1442",{
+        method: 'POST',
+        headers:{
+            'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+        },
+        body: formData
+    }).then((response)=>{
+        return response.text();
+    }).then((response)=>{
+        chrome.action.setIcon({path: "iconConnected.png"});
+        keepalive(response);
+    }).catch(error=>{
+        console.log(error);
+        start();
+    });
 }
 
-function keepalive(result) {
-	console.log(result);
-	if(result.search("logged in as")!=-1) {
-		chrome.browserAction.setIcon({path: "iconConnected.png"});
+function keepalive(result){
+    console.log(result);
+    var url = "https://agnigarh.iitg.ac.in:1442/keepalive?"
+    if(result.search("logged in as")!=-1) {
+		chrome.action.setIcon({path: "iconConnected.png"});
 	}
 	if(result.search("Firewall authentication failed")!=-1) {
 		chrome.notifications.create({
@@ -89,49 +102,33 @@ function keepalive(result) {
 	      "message": "Maybe you are logged in somewhere else too."
 	    });
 	    return;
-		// $.ajax({
-	 //        url: "https://agnigarh.iitg.ac.in:1442/logout?030403030f050d06",
-	 //        type: "GET",
-	 //        success: start,
-	 //        error: function(error) {
-	 //          console.log(error);
-	 //        }
-  //     	});
 	}
-	const url = $(result).text().split("location.href=")[1].split("\"")[1];
-	console.log(url);
-	if(url) {
-		$.ajax({
-			url,
-			type: "GET",
-			success: function(result) {
-				console.log("AutoLogin Refreshed")
-				chrome.browserAction.setIcon({path: "iconConnected.png"});
-				iconWatch(url);
-			},
-			error: function(error) {
-				console.log(error);
-				chrome.browserAction.setIcon({path: "iconDisconnected.png"});
-			}
-		});
-	}
+    setInterval(function(){
+        if(url) {
+            fetch(url).then(response=>{
+                if(!response.ok){
+                    chrome.action.setIcon({path: "iconDisconnected.png"});
+                }else{
+                    chrome.action.setIcon({path: "iconConnected.png"});
+                }
+            }).catch(error=>{
+                console.log(error);
+                chrome.action.setIcon({path: "iconDisconnected.png"});
+            })
+        }
+    }, 600000);
 }
 
-function iconWatch(url) {
-	setInterval(function(){
-		if(url) {
-			$.ajax({
-				url,
-				type: "GET",
-				success: function(result) {
-					chrome.browserAction.setIcon({path: "iconConnected.png"});
-				},
-				error: function(error) {
-					chrome.browserAction.setIcon({path: "iconDisconnected.png"});
-				}
-			});
-		}
-	}, 2000);
-}
-
-get_options();
+chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
+    if (message.action === "login") {
+        getcred();
+    }else if(message.action === "logout"){
+        fetch("https://agnigarh.iitg.ac.in:1442/logout?").then(response=>{
+            if(response.ok){
+                chrome.action.setIcon({path: "iconDisconnected.png"});
+            }
+        }).catch(error=>{
+            console.log(error);
+        });
+    }
+});
