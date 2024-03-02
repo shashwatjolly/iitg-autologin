@@ -1,29 +1,26 @@
 {
-  "manifest_version": 2,
-
-  "name": "IITG AutoLogin",
-  "description": "This extension will automatically log you into the IITG network. No need to login everytime or keep a tab open!",
-  "version": "1.3",
-
-  "background": {
-    "scripts": ["jquery.min.js","background.js"]
-  },
-
-  "permissions": [
-    "https://agnigarh.iitg.ac.in:1442/*",
-    "storage",
-    "notifications"
-  ],
-
-  "browser_action": {
-    "default_popup": "popup.html",
-    "default_icon": "icon.png"
-  },
-
-  "options_ui": {
-    "page": "options.html",
-    "open_in_tab": false
-  },
-
-  "icons": { "128": "icon.png" }
-}
+    "manifest_version": 3,
+    "name": "IITG Autologin",
+    "version": "1.4",
+    "description": "This extension will automatically log you into the IITG network. No need to login everytime or keep a tab open!",
+    "options_ui": {
+      "page": "options.html",
+      "open_in_tab": false
+    },
+    "permissions": [
+      "storage",
+      "notifications"
+    ],
+    "host_permissions" : [
+        "https://agnigarh.iitg.ac.in:1442/*"
+    ],
+    "action": {
+      "default_popup": "popup.html",
+      "default_icon": "icon.png"
+    },
+    "background": {
+        "service_worker": "background.js"
+    },
+    "icons": { "128": "icon.png" }
+  }
+  

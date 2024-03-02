@@ -1,31 +1,18 @@
-chrome.storage.sync.get([
-  "username",
-  "password"
-], function(items) {
-  if(items.username) {
-    $("#msg").hide();
-    $('#logout').on('click', function() {
-      $.ajax({
-        url: "https://agnigarh.iitg.ac.in:1442/logout?030403030f050d06",
-        type: "GET",
-        success: function() {
-          chrome.browserAction.setIcon({path: "iconDisconnected.png"});
-        },
-        error: function(error) {
-          console.log(error);
-        }
-      });
-    });   
-    $('#login').on('click', function() {
-      chrome.extension.getBackgroundPage().get_options();
-    }); 
-  }
-  else {
-    $("#login").hide();
-    $("#logout").hide();
-  }
-});
+document.addEventListener('DOMContentLoaded', function() {
+    var button1 = document.getElementById('login');
+    var button2 = document.getElementById('logout');
+    var button3 = document.getElementById('changecred');
 
-$('#changecred').on('click', function() {
-  chrome.runtime.openOptionsPage();
-}); 
+    button1.addEventListener('click', function() {
+        chrome.runtime.sendMessage({action:"login"});
+    });
+
+    button2.addEventListener('click', function() {
+        chrome.runtime.sendMessage({action:"logout"});
+    });
+
+    button3.addEventListener('click', function() {
+        // Action for Button 3
+        chrome.runtime.openOptionsPage();
+    });
+});
